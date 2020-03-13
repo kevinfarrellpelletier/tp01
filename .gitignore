@@ -1,0 +1,7 @@
+.vs
+Debug
+*.sln
+*.vcxproj
+*.user
+*.filters
+ConsoleApplication1.cpp
