@@ -5,7 +5,7 @@ int readInt(std::string type);
 int PGCD(int numerator, int denominator);
 void remplirTableau(int num[], int denom[], int);
 void affiche(int num[], int denom[], int);
-void simplify(int* numerator, int* denominator);
+void simplify(int* numerator, int* denominator, int pgcd);
 
 /*
 	Programme Principal.  
@@ -70,13 +70,13 @@ void remplirTableau(int num[], int denom[], int nbFract) {
 	Utilise nbFract pour boucler N fois afin de remplir le tableau.
 	Les numérateurs et dénominateurs sont enregistrés dans les tableaux num et denom respectivement,
 	afin de créer une fraction en joignant logiquement les tableaux via l'index de position.
-	L'index de position est utilisé pour afficher les morceaux de fractions correspondants
+	L'index de position est utilisé pour afficher les morceaux de fractions correspondants.
 */
 void affiche(int num[], int denom[], int nbFract) {
 
 	for (int i = 0; i < nbFract; i++) {
 		std::cout << num[i] << "/" << denom[i] << " >>> ";
-		simplify(&num[i], &denom[i]);
+		simplify(&num[i], &denom[i], PGCD(num[i], denom[i]));
 		std::cout << num[i] << "/" << denom[i] << std::endl;
 	}
 }
@@ -86,23 +86,38 @@ void affiche(int num[], int denom[], int nbFract) {
 	Calcule et retourne le PGCD en utilisant le numérateur et dénominateur passés en paramètre
 */
 int PGCD(int numerator, int denominator) {
-	int min = (numerator > denominator) ? denominator : numerator;
-	int pgcd = 1;
 
-	for (int i = 1; i <= min; i++) {
-		if ((numerator % i == 0) && (denominator % i == 0)) {
-			pgcd = i;
-		}
+	if (numerator == 0)
+		return denominator;
+	if (denominator == 0 || numerator == 1)
+		return numerator;
+
+	int k;
+
+	for (k = 0; ((numerator | denominator) && 1) == 0; ++k) {
+		numerator >>= 1;
+		denominator >>= 1;
 	}
-	return pgcd;
+
+	while ((numerator > 1) == 0)
+		numerator >>= 1;
+
+	do {
+		while ((denominator > 1) == 0)
+			denominator >>= 1;
+		if (numerator > denominator)
+			std::swap(numerator, denominator);
+		denominator = (denominator - numerator);
+	} while (denominator != 0);
+
+	return numerator << k;
 }
 
 /*
 	Fonction qui modifie une fraction en la simplifiant.  
 	Utilise le PGCD pour réduire (diviser) au maximum une fraction.
 */
-void simplify(int* numerator, int* denominator) {
-	int pgcd = PGCD(*numerator, *denominator);
+void simplify(int* numerator, int* denominator, int pgcd) {
 	*numerator = (*numerator / pgcd);
 	*denominator = (*denominator / pgcd);
 }
